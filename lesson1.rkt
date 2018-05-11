@@ -82,9 +82,51 @@
 ; evaluated immediately and p is an infinte loop. If using normal order, p would never be evaluated
 ; and the expression would result in 0
 
+;;;; Exercise 1.6
+
+(define (average x y) 
+  (/ (+ x y) 2))
+
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.001))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (new-if predicate 
+                then-clause 
+                else-clause)
+  (cond (predicate then-clause)
+        (else else-clause)))
+
+(new-if (= 2 3) 0 5); 5
+
+(new-if (= 1 1) 0 5); 0
+
+(define (sqrt-iter guess x)
+  (new-if (good-enough? guess x)
+          guess
+          (sqrt-iter (improve guess x) x)))
+
+; Q: What would happen if you evaulate (sqrt-iter 8 16)
+; A: Because new-if is a function and this LISP uses
+;    applicative order, the 'then' and 'else' clauses
+;    attempt to evaluate before the condition so the sqrt-iter
+;    will evaluate indefinately because good-enough? will never be checked.
+;    if is part of the language and uses normal order.
 
 
+;;;; Exercise 1.7
 
 
+; Q: What is an alternative good-enough? definition that
+;    could handle very small or very large numbers
 
+(define (good-enough-not-shitty? guess x)
+  (< (abs (- (square guess) x)) 0.00000000000000001)); TODO <-- actually make this not-shitty
 
+(define (sqrt-iter-not-shitty guess x)
+  (cond ((good-enough-not-shitty? guess x) guess)
+        (else (sqrt-iter-not-shitty (improve guess x) x))))
+
+(sqrt-iter-not-shitty 6 16)
